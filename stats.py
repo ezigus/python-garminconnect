@@ -11,6 +11,7 @@ import json
 import logging
 import os
 import sys
+import time
 import pandas as pd
 
 import requests
@@ -175,18 +176,41 @@ def display_max_metric():
 
 def display_all():
 
+    full_name = api.get_full_name()
+    print(full_name)
+    time.sleep(5)
+
+    stats = api.get_stats(today.isoformat())
+    print(stats)
+    time.sleep(5)
+
+    training_status = api.get_training_status(today.isoformat())
+    print(training_status)
+    time.sleep(5)
+
+    sleep = api.get_sleep_data("{today.isoformat()}")
+    print(sleep)
+    time.sleep(5)
+
+    hrv = api.get_hrv_data({today.isoformat()})
+    print(hrv)
+    time.sleep(5)
+
+    stress = api.get_stress_data("{today.isoformat()}")
+    print(stress)
+    time.sleep(5)
+
     dictionary1 = {
-        "name": api.get_full_name(),
-        "stats": api.get_stats(today.isoformat()),
-        "status": api.get_training_status(today.isoformat()),
-        "training status": api.get_training_status("{today.isoformat()}"),
-        "sleep": api.get_sleep_data("{today.isoformat()}"),
-        "HRV": api.get_hrv_data({today.isoformat()}),
-        "stress": api.get_stress_data("{today.isoformat()}"),
+        "name": full_name(),
+        "stats": stats,
+        "training_status": training_status,
+        "sleep": sleep,
+        "HRV": hrv,
+        "stress": stress,
     }
 
     # merged = pd.concat([df2, df3], axis=1)
-    print(json.dumps(dictionary1, indent=4))
+    #    print(json.dumps(dictionary1, indent=4))
     with open("garmin.json", "w") as outputfile:
         json.dump(dictionary1, outputfile, indent=4)
 
