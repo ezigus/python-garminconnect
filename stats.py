@@ -243,10 +243,10 @@ menu_options = {
     #     f"Get training readiness data for '{today.isoformat()}'",
     #     display_training_readiness,
     # ),
-    # # "3": (
-    #     f"Get training status data for '{today.isoformat()}'",
-    #     display_training_status,
-    # ),
+    "3": (
+        f"Get training status data for '{today.isoformat()}'",
+        display_training_status,
+    ),
     # "b": f"Get hydration data for '{today.isoformat()}'",
     "4": (f"Get sleep data for '{today.isoformat()}'", display_sleep_data),
     "5": (f"Get stress data for '{today.isoformat()}'", display_stress_data),
