@@ -225,36 +225,36 @@ def display_all():
 menu_options = {
     "a": (f"Get all z data {today.isoformat()}'", display_all),
     "1": ("Get full name", display_full_name),
-    "2": ("Get unit system", display_unit),
-    "3": (f"Get activity data for '{today.isoformat()}'", display_activity_data),
-    "4": (
-        f"Get activity data for '{today.isoformat()}' (compatible with garminconnect-ha)",
-        display_activity_data_compat,
-    ),
-    "5": (
-        f"Get body composition data for '{today.isoformat()}' (compatible with garminconnect-ha)",
-        display_body_composition,
-    ),
+    #    "2": ("Get unit system", display_unit),
+    "2": (f"Get activity data for '{today.isoformat()}'", display_activity_data),
+    # "4": (
+    #     f"Get activity data for '{today.isoformat()}' (compatible with garminconnect-ha)",
+    #     display_activity_data_compat,
+    # ),
+    # "5": (
+    #     f"Get body composition data for '{today.isoformat()}' (compatible with garminconnect-ha)",
+    #     display_body_composition,
+    # ),
     # "6": f"Get body composition data for from '{startdate.isoformat()}' to '{today.isoformat()}' (to be compatible with garminconnect-ha)",
     # "7": f"Get stats and body composition data for '{today.isoformat()}'",
     # "8": f"Get steps data for '{today.isoformat()}'",
     # "9": f"Get heart rate data for '{today.isoformat()}'",
-    "0": (
-        f"Get training readiness data for '{today.isoformat()}'",
-        display_training_readiness,
-    ),
-    ".": (
-        f"Get training status data for '{today.isoformat()}'",
-        display_training_status,
-    ),
+    # "0": (
+    #     f"Get training readiness data for '{today.isoformat()}'",
+    #     display_training_readiness,
+    # ),
+    # # "3": (
+    #     f"Get training status data for '{today.isoformat()}'",
+    #     display_training_status,
+    # ),
     # "b": f"Get hydration data for '{today.isoformat()}'",
-    "c": (f"Get sleep data for '{today.isoformat()}'", display_sleep_data),
-    "d": (f"Get stress data for '{today.isoformat()}'", display_stress_data),
+    "4": (f"Get sleep data for '{today.isoformat()}'", display_sleep_data),
+    "5": (f"Get stress data for '{today.isoformat()}'", display_stress_data),
     # "e": f"Get respiration data for '{today.isoformat()}'",
     # "f": f"Get SpO2 data for '{today.isoformat()}'",
-    "g": (
-        f"Get max metric data (like vo2MaxValue and fitnessAge) for '{today.isoformat()}'",
-    ),
+    #    "g": (
+    #         f"Get max metric data (like vo2MaxValue and fitnessAge) for '{today.isoformat()}'",
+    #     ),
     # "h": "Get personal record for user",
     # "i": "Get earned badges for user",
     # "j": f"Get adhoc challenges data from start '{start}' and limit '{limit}'",
@@ -264,16 +264,16 @@ menu_options = {
     # "n": f"Get activities data from start '{start}' and limit '{limit}'",
     # "o": "Get last activity",
     # "p": f"Download activities data by date from '{startdate.isoformat()}' to '{today.isoformat()}'",
-    "r": (
-        f"Get all kinds of activities data from '{start}'",
-        display_all_activity_data,
-    ),
+    # "r": (
+    #     f"Get all kinds of activities data from '{start}'",
+    #     display_all_activity_data,
+    # ),
     # "s": f"Upload activity data from file '{activityfile}'",
     # "t": "Get all kinds of Garmin device info",
     # "u": "Get active goals",
     # "v": "Get future goals",
     # "w": "Get past goals",
-    "x": (
+    "6": (
         f"Get Heart Rate Variability data (HRV) for '{today.isoformat()}'",
         display_HRV,
     ),
