@@ -179,45 +179,56 @@ def display_all():
 
     full_name = api.get_full_name()
     print(full_name)
-    time.sleep(5)
+    # time.sleep(5)
 
     stats = api.get_stats(today.isoformat())
     print(stats)
     time.sleep(5)
 
-    # training_status = api.get_training_status(today.isoformat())
-    # print(training_status)
-    # time.sleep(5)
+    training_status = api.get_training_status(today.isoformat())
+    print(training_status)
+    time.sleep(5)
 
-    # sleep = api.get_sleep_data("{today.isoformat()}")
-    # print(sleep)
-    # time.sleep(5)
+    sleep = api.get_sleep_data("{today.isoformat()}")
+    print(sleep)
+    time.sleep(5)
 
-    # hrv = api.get_hrv_data({today.isoformat()})
-    # print(hrv)
-    # time.sleep(5)
+    hrv = api.get_hrv_data({today.isoformat()})
+    print(hrv)
+    time.sleep(5)
 
-    # stress = api.get_stress_data("{today.isoformat()}")
-    # print(stress)
-    # time.sleep(5)
+    stress = api.get_stress_data("{today.isoformat()}")
+    print(stress)
+    time.sleep(5)
 
-    garmmin_data = {
+    garmin_data = {
         "date": today.isoformat(),
         "name": full_name,
         "stats": stats,
-        # "training_status": training_status,
-        # "sleep": sleep,
-        # "HRV": hrv,
-        # "stress": stress
+        "training_status": training_status,
+        "HRV": hrv,
+        "stress": stress,
+        "sleep": sleep,
     }
 
-    # merged = pd.concat([df2, df3], axis=1)
-    #    print(json.dumps(dictionary1, indent=4))
+    # read the original garmin.jso file in, then append any new data retrieved
+    # write out to garmin.json file the data retrieved from garmin connect
     with open(
         "/home/ezigus/code/garmin/python-garminconnect/garmin.json", "r+"
     ) as file:
         input_data = json.load(file)
-        input_data["garmin_data"].append(garmmin_data)
+
+        # but only write the data if the data was not already retrieved
+        # checking to see if the data received is already in the garmin.json file
+        check_date = any(
+            d["date"] == today.isoformat() for d in input_data["garmin_data"]
+        )
+
+        if check_date:
+            print(f"date {today.isoformat()} found")
+            return
+
+        input_data["garmin_data"].append(garmin_data)
         file.seek(0)
         json.dump(input_data, file, indent=4)
 
