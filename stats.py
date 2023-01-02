@@ -45,171 +45,71 @@ start_badge = 1  # Badge related calls calls start counting at 1
 activitytype = ""  # Possible values are: cycling, running, swimming, multi_sport, fitness_equipment, hiking, walking, other
 activityfile = "MY_ACTIVITY.fit"  # Supported file types are: .fit .gpx .tcx
 
-
-def display_full_name():
-    display_json("api.get_full_name()", api.get_full_name())
+garmin_data = {}
 
 
-def display_unit():
-    display_json("api.get_unit_system()", api.get_unit_system())
+def get_full_name():
+    full_name = api.get_full_name()
+    display_json("api.get_full_name()", full_name)
+    garmin_data.update({"training_status": full_name})
 
 
-def display_activity_data():
+def get_activity_data():
     # USER STATISTIC SUMMARIES
     # Get activity data for 'YYYY-MM-DD'
-    display_json(
-        f"api.get_stats('{today.isoformat()}')",
-        api.get_stats(today.isoformat()),
-    )
+    activity_data = api.get_stats(today.isoformat())
+    display_json(f"api.get_stats('{today.isoformat()}')", activity_data)
+    garmin_data.update({"training_status": activity_data})
 
 
-def display_activity_data_compat():
-    # Get activity data (to be compatible with garminconnect-ha)
-    display_json(
-        f"api.get_user_summary('{today.isoformat()}')",
-        api.get_user_summary(today.isoformat()),
-    )
-
-
-def display_body_composition():
-    # Get body composition data for 'YYYY-MM-DD' (to be compatible with garminconnect-ha)
-    display_json(
-        f"api.get_body_composition('{today.isoformat()}')",
-        api.get_body_composition(today.isoformat()),
-    )
-
-
-def display_HRV():
+def get_HRV():
     # Get Heart Rate Variability (hrv) data
-    display_json(
-        f"api.get_hrv_data({today.isoformat()})",
-        api.get_hrv_data(today.isoformat()),
-    )
+    hrv_data = api.get_hrv_data(today.isoformat())
+    display_json(f"api.get_hrv_data({today.isoformat()})", hrv_data)
+    garmin_data.update({"training_status": hrv_data})
 
 
-def display_all_activity_data(start: int = 0, limit: int = 1):
-    # Get activities data from start and limit
-    activities = api.get_activities(start, limit)  # 0=start, 1=limit
-
-    # Get activity splits
-    first_activity_id = activities[0].get("activityId")
-
-    display_json(
-        f"api.get_activity_splits({first_activity_id})",
-        api.get_activity_splits(first_activity_id),
-    )
-
-    # Get activity split summaries for activity id
-    display_json(
-        f"api.get_activity_split_summaries({first_activity_id})",
-        api.get_activity_split_summaries(first_activity_id),
-    )
-
-    # Get activity weather data for activity
-    display_json(
-        f"api.get_activity_weather({first_activity_id})",
-        api.get_activity_weather(first_activity_id),
-    )
-
-    # Get activity hr timezones id
-    display_json(
-        f"api.get_activity_hr_in_timezones({first_activity_id})",
-        api.get_activity_hr_in_timezones(first_activity_id),
-    )
-
-    # Get activity details for activity id
-    display_json(
-        f"api.get_activity_details({first_activity_id})",
-        api.get_activity_details(first_activity_id),
-    )
-
-    # Get gear data for activity id
-    display_json(
-        f"api.get_activity_gear({first_activity_id})",
-        api.get_activity_gear(first_activity_id),
-    )
-
-    # Activity self evaluation data for activity id
-    display_json(
-        f"api.get_activity_evaluation({first_activity_id})",
-        api.get_activity_evaluation(first_activity_id),
-    )
-
-
-def display_sleep_data():
+def get_sleep_data():
     # Get sleep data for 'YYYY-MM-DD'
-    display_json(
-        f"api.get_sleep_data('{today.isoformat()}')",
-        api.get_sleep_data(today.isoformat()),
-    )
+    sleep_data = api.get_sleep_data(today.isoformat())
+    display_json(f"sleep_data ('{today.isoformat()}')", sleep_data)
+    garmin_data.update({"training_status": sleep_data})
 
 
-def display_stress_data():
+def get_stress_data():
+    stress_data = api.get_stress_data(today.isoformat())
     # Get stress data for 'YYYY-MM-DD'
-    display_json(
-        f"api.get_stress_data('{today.isoformat()}')",
-        api.get_stress_data(today.isoformat()),
-    )
+    display_json(f"stress_data ('{today.isoformat()}')", stress_data)
+    garmin_data.update({"training_status": stress_data})
 
 
-def display_training_readiness():
-    # Get training readiness data for 'YYYY-MM-DD'
-    display_json(
-        f"api.get_training_readiness('{today.isoformat()}')",
-        api.get_training_readiness(today.isoformat()),
-    )
-
-
-def display_training_status():
+def get_training_status():
     # Get training status data for 'YYYY-MM-DD'
-    display_json(
-        f"api.get_training_status('{today.isoformat()}')",
-        api.get_training_status(today.isoformat()),
-    )
-
-
-def display_max_metric():
-    display_json(
-        f"api.get_max_metrics('{today.isoformat()}')",
-        api.get_max_metrics(today.isoformat()),
-    )
-
-
-def display_all():
-
-    full_name = api.get_full_name()
-    print(full_name)
-    # time.sleep(5)
-
-    stats = api.get_stats(today.isoformat())
-    print(stats)
-    time.sleep(5)
-
     training_status = api.get_training_status(today.isoformat())
-    print(training_status)
-    time.sleep(5)
+    display_json(f"api.get_training_status('{today.isoformat()}')", training_status)
+    garmin_data.update({"training_status": training_status})
 
-    sleep = api.get_sleep_data("{today.isoformat()}")
-    print(sleep)
-    time.sleep(5)
 
-    hrv = api.get_hrv_data({today.isoformat()})
-    print(hrv)
-    time.sleep(5)
+def get_all():
 
-    stress = api.get_stress_data("{today.isoformat()}")
-    print(stress)
-    time.sleep(5)
+    get_full_name()
+    get_activity_data()
+    get_training_status()
+    get_HRV()
+    get_stress_data()
+    get_sleep_data()
 
-    garmin_data = {
-        "date": today.isoformat(),
-        "name": full_name,
-        "stats": stats,
-        "training_status": training_status,
-        "HRV": hrv,
-        "stress": stress,
-        "sleep": sleep,
-    }
+    print(garmin_data)
+
+    # garmin_data = {
+    #     "date": today.isoformat(),
+    #     "name": full_name,
+    #     "stats": stats,
+    #     "training_status": training_status,
+    #     "HRV": hrv,
+    #     "stress": stress,
+    #     "sleep": sleep,
+    # }
 
     # read the original garmin.jso file in, then append any new data retrieved
     # write out to garmin.json file the data retrieved from garmin connect
@@ -232,19 +132,12 @@ def display_all():
         file.seek(0)
         json.dump(input_data, file, indent=4)
 
-    # # display_activity_data()  # summary of daily activity
-    # display_training_readiness()
-    # display_training_status()
-    # display_HRV()
-    # display_sleep_data()
-    # display_stress_data()
-
 
 menu_options = {
-    "a": (f"Get all z data {today.isoformat()}'", display_all),
-    "1": ("Get full name", display_full_name),
+    "a": (f"Get all z data {today.isoformat()}'", get_all),
+    "1": ("Get full name", get_full_name),
     #    "2": ("Get unit system", display_unit),
-    "2": (f"Get activity data for '{today.isoformat()}'", display_activity_data),
+    "2": (f"Get activity data for '{today.isoformat()}'", get_activity_data),
     # "4": (
     #     f"Get activity data for '{today.isoformat()}' (compatible with garminconnect-ha)",
     #     display_activity_data_compat,
@@ -263,11 +156,11 @@ menu_options = {
     # ),
     "3": (
         f"Get training status data for '{today.isoformat()}'",
-        display_training_status,
+        get_training_status,
     ),
     # "b": f"Get hydration data for '{today.isoformat()}'",
-    "4": (f"Get sleep data for '{today.isoformat()}'", display_sleep_data),
-    "5": (f"Get stress data for '{today.isoformat()}'", display_stress_data),
+    "4": (f"Get sleep data for '{today.isoformat()}'", get_sleep_data),
+    "5": (f"Get stress data for '{today.isoformat()}'", get_stress_data),
     # "e": f"Get respiration data for '{today.isoformat()}'",
     # "f": f"Get SpO2 data for '{today.isoformat()}'",
     #    "g": (
@@ -293,7 +186,7 @@ menu_options = {
     # "w": "Get past goals",
     "6": (
         f"Get Heart Rate Variability data (HRV) for '{today.isoformat()}'",
-        display_HRV,
+        get_HRV,
     ),
     # "G": f"Get Gear'",
     # "Z": "Logout Garmin Connect portal",
