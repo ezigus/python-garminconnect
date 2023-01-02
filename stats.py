@@ -52,6 +52,7 @@ def get_full_name():
     full_name = api.get_full_name()
     display_json("api.get_full_name()", full_name)
     garmin_data.update({"training_status": full_name})
+    garmin_data.update({"date": today.isoformat()})
 
 
 def get_activity_data():
@@ -90,27 +91,7 @@ def get_training_status():
     garmin_data.update({"training_status": training_status})
 
 
-def get_all():
-
-    get_full_name()
-    get_activity_data()
-    get_training_status()
-    get_HRV()
-    get_stress_data()
-    get_sleep_data()
-
-    print(garmin_data)
-
-    # garmin_data = {
-    #     "date": today.isoformat(),
-    #     "name": full_name,
-    #     "stats": stats,
-    #     "training_status": training_status,
-    #     "HRV": hrv,
-    #     "stress": stress,
-    #     "sleep": sleep,
-    # }
-
+def write_garmin_data():
     # read the original garmin.jso file in, then append any new data retrieved
     # write out to garmin.json file the data retrieved from garmin connect
     with open(
@@ -120,9 +101,9 @@ def get_all():
 
         # but only write the data if the data was not already retrieved
         # checking to see if the data received is already in the garmin.json file
-        check_date = any(
-            d["date"] == today.isoformat() for d in input_data["garmin_data"]
-        )
+        # check_date = any(
+        #     d["date"] == today.isoformat() for d in input_data["garmin_data"]
+        # )
 
         if check_date:
             print(f"date {today.isoformat()} found")
@@ -133,63 +114,52 @@ def get_all():
         json.dump(input_data, file, indent=4)
 
 
+def check_garmin_date() -> bool:
+
+    with open("/home/ezigus/code/garmin/python-garminconnect/garmin.json", "r") as file:
+        input_data = json.load(file)
+
+        # but only write the data if the data was not already retrieved
+        # checking to see if the data received is already in the garmin.json file
+        check_date = any(
+            d["date"] == today.isoformat() for d in input_data["garmin_data"]
+        )
+        return check_date
+
+
+def get_all():
+
+    if check_garmin_date() == True:
+        print(f"Data already loaded for {today.isoformat()}")
+        return
+
+    get_full_name()
+    get_activity_data()
+    get_training_status()
+    get_HRV()
+    get_stress_data()
+    get_sleep_data()
+
+    print(garmin_data)
+
+    write_garmin_data()
+
+
 menu_options = {
     "a": (f"Get all z data {today.isoformat()}'", get_all),
     "1": ("Get full name", get_full_name),
-    #    "2": ("Get unit system", display_unit),
     "2": (f"Get activity data for '{today.isoformat()}'", get_activity_data),
-    # "4": (
-    #     f"Get activity data for '{today.isoformat()}' (compatible with garminconnect-ha)",
-    #     display_activity_data_compat,
-    # ),
-    # "5": (
-    #     f"Get body composition data for '{today.isoformat()}' (compatible with garminconnect-ha)",
-    #     display_body_composition,
-    # ),
-    # "6": f"Get body composition data for from '{startdate.isoformat()}' to '{today.isoformat()}' (to be compatible with garminconnect-ha)",
-    # "7": f"Get stats and body composition data for '{today.isoformat()}'",
-    # "8": f"Get steps data for '{today.isoformat()}'",
-    # "9": f"Get heart rate data for '{today.isoformat()}'",
-    # "0": (
-    #     f"Get training readiness data for '{today.isoformat()}'",
-    #     display_training_readiness,
-    # ),
     "3": (
         f"Get training status data for '{today.isoformat()}'",
         get_training_status,
     ),
-    # "b": f"Get hydration data for '{today.isoformat()}'",
     "4": (f"Get sleep data for '{today.isoformat()}'", get_sleep_data),
     "5": (f"Get stress data for '{today.isoformat()}'", get_stress_data),
-    # "e": f"Get respiration data for '{today.isoformat()}'",
-    # "f": f"Get SpO2 data for '{today.isoformat()}'",
-    #    "g": (
-    #         f"Get max metric data (like vo2MaxValue and fitnessAge) for '{today.isoformat()}'",
-    #     ),
-    # "h": "Get personal record for user",
-    # "i": "Get earned badges for user",
-    # "j": f"Get adhoc challenges data from start '{start}' and limit '{limit}'",
-    # "k": f"Get available badge challenges data from '{start_badge}' and limit '{limit}'",
-    # "l": f"Get badge challenges data from '{start_badge}' and limit '{limit}'",
-    # "m": f"Get non completed badge challenges data from '{start_badge}' and limit '{limit}'",
-    # "n": f"Get activities data from start '{start}' and limit '{limit}'",
-    # "o": "Get last activity",
-    # "p": f"Download activities data by date from '{startdate.isoformat()}' to '{today.isoformat()}'",
-    # "r": (
-    #     f"Get all kinds of activities data from '{start}'",
-    #     display_all_activity_data,
-    # ),
-    # "s": f"Upload activity data from file '{activityfile}'",
-    # "t": "Get all kinds of Garmin device info",
-    # "u": "Get active goals",
-    # "v": "Get future goals",
-    # "w": "Get past goals",
     "6": (
         f"Get Heart Rate Variability data (HRV) for '{today.isoformat()}'",
         get_HRV,
     ),
-    # "G": f"Get Gear'",
-    # "Z": "Logout Garmin Connect portal",
+    "w": (f"Write Garmin Data {today.isoformat()}", write_garmin_data),
     "q": ("Exit", sys.exit),
 }
 
