@@ -202,17 +202,13 @@ def display_all():
     # time.sleep(5)
 
     garmmin_data = {
-        "garmin_data": [
-            {
-                "date": today.isoformat(),
-                "name": full_name,
-                "stats": stats,
-                # "training_status": training_status,
-                # "sleep": sleep,
-                # "HRV": hrv,
-                # "stress": stress
-            }
-        ]
+        "date": today.isoformat(),
+        "name": full_name,
+        "stats": stats,
+        # "training_status": training_status,
+        # "sleep": sleep,
+        # "HRV": hrv,
+        # "stress": stress
     }
 
     # merged = pd.concat([df2, df3], axis=1)
@@ -221,11 +217,9 @@ def display_all():
         "/home/ezigus/code/garmin/python-garminconnect/garmin.json", "r+"
     ) as file:
         input_data = json.load(file)
-        print(input_data)
-        input_data[0].append(garmmin_data)
-        print(input_data)
+        input_data["garmin_data"].append(garmmin_data)
         file.seek(0)
-        json.dump(garmmin_data, file, indent=4)
+        json.dump(input_data, file, indent=4)
 
     # # display_activity_data()  # summary of daily activity
     # display_training_readiness()
