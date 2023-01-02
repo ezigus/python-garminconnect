@@ -51,7 +51,7 @@ garmin_data = {}
 def get_full_name():
     full_name = api.get_full_name()
     display_json("api.get_full_name()", full_name)
-    garmin_data.update({"training_status": full_name})
+    garmin_data.update({"name": full_name})
     garmin_data.update({"date": today.isoformat()})
 
 
@@ -60,28 +60,28 @@ def get_activity_data():
     # Get activity data for 'YYYY-MM-DD'
     activity_data = api.get_stats(today.isoformat())
     display_json(f"api.get_stats('{today.isoformat()}')", activity_data)
-    garmin_data.update({"training_status": activity_data})
+    garmin_data.update({"Activity": activity_data})
 
 
 def get_HRV():
     # Get Heart Rate Variability (hrv) data
     hrv_data = api.get_hrv_data(today.isoformat())
     display_json(f"api.get_hrv_data({today.isoformat()})", hrv_data)
-    garmin_data.update({"training_status": hrv_data})
+    garmin_data.update({"HRV": hrv_data})
 
 
 def get_sleep_data():
     # Get sleep data for 'YYYY-MM-DD'
     sleep_data = api.get_sleep_data(today.isoformat())
     display_json(f"sleep_data ('{today.isoformat()}')", sleep_data)
-    garmin_data.update({"training_status": sleep_data})
+    garmin_data.update({"Sleep": sleep_data})
 
 
 def get_stress_data():
     stress_data = api.get_stress_data(today.isoformat())
     # Get stress data for 'YYYY-MM-DD'
     display_json(f"stress_data ('{today.isoformat()}')", stress_data)
-    garmin_data.update({"training_status": stress_data})
+    garmin_data.update({"Stress": stress_data})
 
 
 def get_training_status():
@@ -91,7 +91,16 @@ def get_training_status():
     garmin_data.update({"training_status": training_status})
 
 
+def display_garmin_data():
+    print(garmin_data)
+
+
 def write_garmin_data():
+
+    if check_garmin_date() == True:
+        print(f"Data saved for {today.isoformat()} already")
+        return
+
     # read the original garmin.jso file in, then append any new data retrieved
     # write out to garmin.json file the data retrieved from garmin connect
     with open(
@@ -105,9 +114,11 @@ def write_garmin_data():
         #     d["date"] == today.isoformat() for d in input_data["garmin_data"]
         # )
 
-        if check_date:
-            print(f"date {today.isoformat()} found")
-            return
+        # if check_date:
+        #     print(f"date {today.isoformat()} found")
+        #     return
+
+        display_text(garmin_data)
 
         input_data["garmin_data"].append(garmin_data)
         file.seek(0)
@@ -140,8 +151,6 @@ def get_all():
     get_stress_data()
     get_sleep_data()
 
-    print(garmin_data)
-
     write_garmin_data()
 
 
@@ -159,6 +168,7 @@ menu_options = {
         f"Get Heart Rate Variability data (HRV) for '{today.isoformat()}'",
         get_HRV,
     ),
+    "d": (f"Display Garmin Data", display_garmin_data),
     "w": (f"Write Garmin Data {today.isoformat()}", write_garmin_data),
     "q": ("Exit", sys.exit),
 }
