@@ -12,7 +12,8 @@ import logging
 import os
 import sys
 import time
-import pandas as pd
+
+# import pandas as pd
 
 import requests
 import pwinput
@@ -184,35 +185,47 @@ def display_all():
     print(stats)
     time.sleep(5)
 
-    training_status = api.get_training_status(today.isoformat())
-    print(training_status)
-    time.sleep(5)
+    # training_status = api.get_training_status(today.isoformat())
+    # print(training_status)
+    # time.sleep(5)
 
-    sleep = api.get_sleep_data("{today.isoformat()}")
-    print(sleep)
-    time.sleep(5)
+    # sleep = api.get_sleep_data("{today.isoformat()}")
+    # print(sleep)
+    # time.sleep(5)
 
-    hrv = api.get_hrv_data({today.isoformat()})
-    print(hrv)
-    time.sleep(5)
+    # hrv = api.get_hrv_data({today.isoformat()})
+    # print(hrv)
+    # time.sleep(5)
 
-    stress = api.get_stress_data("{today.isoformat()}")
-    print(stress)
-    time.sleep(5)
+    # stress = api.get_stress_data("{today.isoformat()}")
+    # print(stress)
+    # time.sleep(5)
 
-    dictionary1 = {
-        "name": full_name(),
-        "stats": stats,
-        "training_status": training_status,
-        "sleep": sleep,
-        "HRV": hrv,
-        "stress": stress,
+    garmmin_data = {
+        "garmin_data": [
+            {
+                "date": today.isoformat(),
+                "name": full_name,
+                "stats": stats,
+                # "training_status": training_status,
+                # "sleep": sleep,
+                # "HRV": hrv,
+                # "stress": stress
+            }
+        ]
     }
 
     # merged = pd.concat([df2, df3], axis=1)
     #    print(json.dumps(dictionary1, indent=4))
-    with open("garmin.json", "w") as outputfile:
-        json.dump(dictionary1, outputfile, indent=4)
+    with open(
+        "/home/ezigus/code/garmin/python-garminconnect/garmin.json", "r+"
+    ) as file:
+        input_data = json.load(file)
+        print(input_data)
+        input_data[0].append(garmmin_data)
+        print(input_data)
+        file.seek(0)
+        json.dump(garmmin_data, file, indent=4)
 
     # # display_activity_data()  # summary of daily activity
     # display_training_readiness()

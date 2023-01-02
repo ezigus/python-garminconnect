@@ -128,3 +128,13 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+*.json
+bin/*
+lib/*
+lib64/*
+include/*
+.vscode/*
+pyvenv.cfg
+lib64
+garmin.json
