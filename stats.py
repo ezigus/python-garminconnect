@@ -6,11 +6,12 @@ export EMAIL=<your garmin email>
 export PASSWORD=<your garmin password>
 
 """
-import datetime
+from datetime import date, timedelta
 import json
 import logging
 import os
 import sys
+import time
 
 
 # import pandas as pd
@@ -37,8 +38,8 @@ password = os.getenv("PASSWORD")
 api = None
 
 # Example selections and settings
-today = datetime.date.today() - datetime.timedelta(days=1)
-startdate = today - datetime.timedelta(days=7)  # Select past week
+today = date.today() - timedelta(days=1)
+startdate = today - timedelta(days=7)  # Select past week
 start = 0
 limit = 100
 start_badge = 1  # Badge related calls calls start counting at 1
@@ -48,57 +49,71 @@ activityfile = "MY_ACTIVITY.fit"  # Supported file types are: .fit .gpx .tcx
 garmin_data = {}
 
 
-def get_full_name():
+def daterange(start_date: date, end_date: date):
+    today_date = date.today()
+    for n in range((end_date - start_date).days):
+        yield today_date + timedelta(n)
+
+
+def get_start_end_offsets():
+    """get both start and end offsets for gathering data"""
+    start_offset = input("Start Offset: ")
+    end_offset = input("End Offset: ")
+
+    return start_offset, end_offset
+
+
+def get_full_name(data_date: date):
     full_name = api.get_full_name()
     display_json("api.get_full_name()", full_name)
     garmin_data.update({"name": full_name})
-    garmin_data.update({"date": today.isoformat()})
+    garmin_data.update({"date": data_date.isoformat()})
 
 
-def get_activity_data():
+def get_activity_data(data_date: date):
     # USER STATISTIC SUMMARIES
     # Get activity data for 'YYYY-MM-DD'
-    activity_data = api.get_stats(today.isoformat())
-    display_json(f"api.get_stats('{today.isoformat()}')", activity_data)
+    activity_data = api.get_stats(data_date.isoformat())
+    display_json(f"api.get_stats('{data_date.isoformat()}')", activity_data)
     garmin_data.update({"Activity": activity_data})
 
 
-def get_HRV():
+def get_HRV(data_date: date):
     # Get Heart Rate Variability (hrv) data
-    hrv_data = api.get_hrv_data(today.isoformat())
-    display_json(f"api.get_hrv_data({today.isoformat()})", hrv_data)
+    hrv_data = api.get_hrv_data(data_date.isoformat())
+    display_json(f"api.get_hrv_data({data_date.isoformat()})", hrv_data)
     garmin_data.update({"HRV": hrv_data})
 
 
-def get_sleep_data():
+def get_sleep_data(data_date: date):
     # Get sleep data for 'YYYY-MM-DD'
-    sleep_data = api.get_sleep_data(today.isoformat())
-    display_json(f"sleep_data ('{today.isoformat()}')", sleep_data)
+    sleep_data = api.get_sleep_data(data_date.isoformat())
+    display_json(f"sleep_data ('{data_date.isoformat()}')", sleep_data)
     garmin_data.update({"Sleep": sleep_data})
 
 
-def get_stress_data():
-    stress_data = api.get_stress_data(today.isoformat())
+def get_stress_data(data_date: date):
+    stress_data = api.get_stress_data(data_date.isoformat())
     # Get stress data for 'YYYY-MM-DD'
-    display_json(f"stress_data ('{today.isoformat()}')", stress_data)
+    display_json(f"stress_data ('{data_date.isoformat()}')", stress_data)
     garmin_data.update({"Stress": stress_data})
 
 
-def get_training_status():
+def get_training_status(data_date: date):
     # Get training status data for 'YYYY-MM-DD'
-    training_status = api.get_training_status(today.isoformat())
-    display_json(f"api.get_training_status('{today.isoformat()}')", training_status)
+    training_status = api.get_training_status(data_date.isoformat())
+    display_json(f"api.get_training_status('{data_date.isoformat()}')", training_status)
     garmin_data.update({"training_status": training_status})
 
 
 def display_garmin_data():
-    print(garmin_data)
+    display_json(garmin_data)
 
 
-def write_garmin_data():
+def write_garmin_data(data_date: date):
 
-    if check_garmin_date() == True:
-        print(f"Data saved for {today.isoformat()} already")
+    if check_garmin_date(data_date) == True:
+        print(f"Data saved for {data_date.isoformat()} already")
         return
 
     # read the original garmin.jso file in, then append any new data retrieved
@@ -108,16 +123,6 @@ def write_garmin_data():
     ) as file:
         input_data = json.load(file)
 
-        # but only write the data if the data was not already retrieved
-        # checking to see if the data received is already in the garmin.json file
-        # check_date = any(
-        #     d["date"] == today.isoformat() for d in input_data["garmin_data"]
-        # )
-
-        # if check_date:
-        #     print(f"date {today.isoformat()} found")
-        #     return
-
         display_text(garmin_data)
 
         input_data["garmin_data"].append(garmin_data)
@@ -125,7 +130,7 @@ def write_garmin_data():
         json.dump(input_data, file, indent=4)
 
 
-def check_garmin_date() -> bool:
+def check_garmin_date(data_date: date) -> bool:
 
     with open("/home/ezigus/code/garmin/python-garminconnect/garmin.json", "r") as file:
         input_data = json.load(file)
@@ -133,25 +138,34 @@ def check_garmin_date() -> bool:
         # but only write the data if the data was not already retrieved
         # checking to see if the data received is already in the garmin.json file
         check_date = any(
-            d["date"] == today.isoformat() for d in input_data["garmin_data"]
+            d["date"] == data_date.isoformat() for d in input_data["garmin_data"]
         )
         return check_date
 
 
-def get_all():
+def get_all(data_date: date):
 
-    if check_garmin_date() == True:
+    if check_garmin_date(data_date) == True:
         print(f"Data already loaded for {today.isoformat()}")
         return
 
-    get_full_name()
-    get_activity_data()
-    get_training_status()
-    get_HRV()
-    get_stress_data()
-    get_sleep_data()
+    get_full_name(data_date)
+    get_activity_data(data_date)
+    get_training_status(data_date)
+    get_HRV(data_date)
+    get_stress_data(data_date)
+    get_sleep_data(data_date)
 
-    write_garmin_data()
+    write_garmin_data(data_date)
+
+
+def get_data_offset(data_date: date):
+    start_offset, end_offset = get_start_end_offsets()
+    _start_date = data_date + timedelta(days=int(start_offset))
+    _end_date = data_date + timedelta(days=int(end_offset))
+    for single_date in daterange(_start_date, _end_date):
+        get_all(single_date)
+        time.sleep(600)
 
 
 menu_options = {
@@ -169,6 +183,7 @@ menu_options = {
         get_HRV,
     ),
     "d": (f"Display Garmin Data", display_garmin_data),
+    "o": (f"Get data between offsets", get_data_offset),
     "w": (f"Write Garmin Data {today.isoformat()}", write_garmin_data),
     "q": ("Exit", sys.exit),
 }
@@ -273,7 +288,7 @@ def switch(api, i):
         try:
             if menu_options[i]:
                 print(f"\n\nExecuting: {menu_options[i][1].__name__}\n")
-                menu_options[i][1]()
+                menu_options[i][1](today)
             else:
                 print("Invalid selection\n")
 
